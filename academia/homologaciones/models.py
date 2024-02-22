@@ -62,6 +62,7 @@ class Homologacion(models.Model):
     cedula = models.CharField(max_length=10, unique=True)
     nombres = models.CharField(max_length=64)
     apellidos = models.CharField(max_length=64)
+    terminada = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Homologación'
