@@ -17,7 +17,7 @@ class ContenidoInLine(admin.TabularInline):
     # classes = ('collapse', )
     extra = 0
     formfield_overrides = {
-        models.TextField: {'widget': Textarea(attrs={'rows':4, 'cols':70})},
+        models.TextField: {'widget': Textarea(attrs={'rows':4, 'cols':50})},
     }
 
 class AsignaturaAdmin(admin.ModelAdmin):

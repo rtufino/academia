@@ -23,7 +23,7 @@ class Ies(models.Model):
         verbose_name_plural = 'IES'
 
     def __str__(self) -> str:
-        return self.codigo
+        return self.nombre
 
 class Carrera(models.Model):
     ies = models.ForeignKey(Ies, on_delete=models.CASCADE)
@@ -34,7 +34,7 @@ class Carrera(models.Model):
     nota_maxima = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
     def __str__(self) -> str:
-        return f"{self.nombre} ({self.ies})"
+        return f"{self.nombre} ({self.ies.codigo})"
 
 class Asignatura(models.Model):
     carrera = models.ForeignKey(Carrera, on_delete=models.CASCADE)
