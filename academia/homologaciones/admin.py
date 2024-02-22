@@ -74,6 +74,10 @@ class HomologacionAdmin(admin.ModelAdmin):
     list_display = ('cedula', 'apellidos', 'nombres', 'fecha', 'origen', 'destino', 'terminada')
     inlines = [AnalisisAdminInLine,]
 
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'rows':3, 'cols':40})},
+    }
+
     def exportar(self, request, queryset):
         output = io.BytesIO()
 
@@ -89,7 +93,7 @@ class HomologacionAdmin(admin.ModelAdmin):
         bold = workbook.add_format({'bold': True})
 
         # Add a number format for cells with percent.
-        percent = workbook.add_format({'num_format': '0.%'})
+        percent = workbook.add_format({'num_format': '0 %'})
 
         decimal = workbook.add_format({'num_format': '0.00'})
 
@@ -108,14 +112,16 @@ class HomologacionAdmin(admin.ModelAdmin):
             worksheet.write(row+2, col, 'APELLIDOS', bold)
             worksheet.write(row+3, col, 'CARRERA ORIGEN', bold)
             worksheet.write(row+4, col, 'CARRERA DESTINO', bold)
+            worksheet.write(row+5, col, 'OBSERVACIONES', bold)
 
             worksheet.write(row, col+1, registro.cedula)
             worksheet.write(row+1, col+1, registro.nombres)
             worksheet.write(row+2, col+1, registro.apellidos)
             worksheet.write(row+3, col+1, registro.origen.__str__())
             worksheet.write(row+4, col+1, registro.destino.__str__())
+            worksheet.write(row+5, col+1, registro.observaciones)
 
-            row += 6
+            row += 7
 
             worksheet.write(row, col, 'CÓDIGO', gris)
             worksheet.write(row, col+1, 'NOMBRE', gris)
