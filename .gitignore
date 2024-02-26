@@ -139,3 +139,8 @@ GitHub.sublime-settings
 
 # Migrations
 migrations/
+
+# Deploy
+*.ini
+academia/staticfiles
+academia/academia/settings.py
