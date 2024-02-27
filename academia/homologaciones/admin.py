@@ -23,16 +23,18 @@ class ContenidoInLine(admin.TabularInline):
 class AsignaturaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'nivel', 'codigo', 'carrera', 'horas')
     inlines = [ContenidoInLine,]
+    list_filter = ["carrera"]
 
 class AsignaturaInLine(admin.TabularInline):
     model = Asignatura
     extra = 0
-    fields = ('nivel', 'nombre', 'horas')
+    fields = ('nivel', 'codigo', 'nombre', 'horas')
     show_change_link = True
     
 class CarreraAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'modalidad', 'ies')
     inlines = [AsignaturaInLine,]
+    list_filter = ["ies"]
 
 class AnalisisAdminInLine(admin.TabularInline):
     model = Analisis
@@ -73,6 +75,10 @@ class AnalisisAdminInLine(admin.TabularInline):
 class HomologacionAdmin(admin.ModelAdmin):
     list_display = ('cedula', 'apellidos', 'nombres', 'fecha', 'origen', 'destino', 'terminada')
     inlines = [AnalisisAdminInLine,]
+    list_filter = ["destino"]
+    search_fields = ['cedula', 'apellidos', 'nombres']
+
+    save_as = True
 
     formfield_overrides = {
         models.TextField: {'widget': Textarea(attrs={'rows':3, 'cols':40})},
@@ -136,27 +142,47 @@ class HomologacionAdmin(admin.ModelAdmin):
             worksheet.write(row, col+10, 'PORCENTAJE DE CORRESPONDENCIA CONTENIDOS', azul)
             worksheet.write(row, col+11, 'CALIFICACIÓN FINAL', azul)
             worksheet.write(row, col+12, 'RESULTADO DEL ANÁLISIS', azul)
+            worksheet.write(row, col+13, 'DERECHO', azul)
             
             analisis = Analisis.objects.filter(homologacion=registro)
             
+            der_por_contenidos = 0
+            der_por_validacion = 0
+
             for i in analisis:
                 row += 1
                 worksheet.write(row, col, i.destino.codigo)
                 worksheet.write(row, col+1, i.destino.nombre)
                 worksheet.write(row, col+2, i.destino.nivel)
-                worksheet.write(row, col+3, i.origen.codigo)
-                worksheet.write(row, col+4, i.origen.nombre)
+                if i.origen is not None:
+                    worksheet.write(row, col+3, i.origen.codigo)
+                    worksheet.write(row, col+4, i.origen.nombre)
+                    worksheet.write(row, col+7, i.origen.horas)
+                    worksheet.write(row, col+6, registro.origen.nota_maxima, decimal)
+                else:
+                    worksheet.write(row, col+3, "---")
+                    worksheet.write(row, col+4, "---")
+                    worksheet.write(row, col+7, 0)
+                    worksheet.write(row, col+6, 0, decimal)
                 worksheet.write(row, col+5, i.nota_aprobacion, decimal)
-                worksheet.write(row, col+6, registro.origen.nota_maxima, decimal)
-                worksheet.write(row, col+7, i.origen.horas)
                 worksheet.write(row, col+8, i.periodo)
                 worksheet.write(row, col+9, (i.porcentaje_horas/100), percent)
                 worksheet.write(row, col+10, (i.porcentaje_contenidos/100), percent)
                 worksheet.write(row, col+11, i.nota_final, decimal)
                 if i.cumple:
                     worksheet.write(row, col+12, 'CUMPLE')
+                    worksheet.write(row, col+13, 'SI')
+                    der_por_contenidos += 1
                 else:
                     worksheet.write(row, col+12, 'NO CUMPLE')
+                    worksheet.write(row, col+13, 'NO')
+                    der_por_validacion += 1
+
+            row += 2
+            worksheet.write(row, col+3, 'TOTAL DERECHOS POR CONTENIDOS')
+            worksheet.write(row+1, col+3, 'TOTAL DERECHOS POR VALIDACIÓN DE CONOCIMIENTOS')
+            worksheet.write(row, col+9, der_por_contenidos )
+            worksheet.write(row+1, col+9, der_por_validacion )
 
         # Close the workbook before sending the data.
         workbook.close()

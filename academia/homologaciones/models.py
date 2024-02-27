@@ -76,11 +76,11 @@ class Homologacion(models.Model):
 class Analisis(models.Model):
     homologacion = models.ForeignKey(Homologacion, on_delete=models.CASCADE)
     destino = models.ForeignKey(Asignatura, on_delete=models.CASCADE, related_name='asignatura_destino')
-    origen = models.ForeignKey(Asignatura, on_delete=models.CASCADE, related_name='asignatura_origen')
+    origen = models.ForeignKey(Asignatura, on_delete=models.CASCADE, related_name='asignatura_origen', blank=True, null=True)
     nota_aprobacion = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    periodo = models.CharField(max_length=128)
-    porcentaje_horas = models.IntegerField(default=80)
-    porcentaje_contenidos = models.IntegerField(default=80)
+    periodo = models.CharField(max_length=128, blank=True)
+    porcentaje_horas = models.IntegerField(default=0)
+    porcentaje_contenidos = models.IntegerField(default=0)
     nota_final = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     cumple = models.BooleanField(default=True)
 
